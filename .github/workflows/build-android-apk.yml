@@ -91,12 +91,9 @@ jobs:
 
       - name: Upload APK to Release
         if: github.event_name == 'release'
-        uses: svenstaro/upload-release-action@v2
+        uses: softprops/action-gh-release@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ghost-guide-example-${{ github.ref_name }}.apk
-          tag: ${{ github.ref }}
-          overwrite: true
+          files: ghost-guide-example-${{ github.ref_name }}.apk
 
       - name: Upload APK as Artifact
         if: github.event_name == 'workflow_dispatch'
