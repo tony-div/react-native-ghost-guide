@@ -28,13 +28,15 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Setup Android SDK with NDK
-        id: setup-android
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
         with:
-          api-level: 34
-          build-tools: 34.0.0
-          ndk-version: '25.2.9519653'
+          ndk-version: 'r25c'
+          add-to-path: false
 
       - name: Install root dependencies
         run: npm install
@@ -63,7 +65,7 @@ jobs:
             echo "No Rust build script or Cargo.toml found, skipping Rust build"
           fi
         env:
-          ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ndk-path }}
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
       - name: Install example dependencies
         run: cd example && npm install
@@ -71,9 +73,9 @@ jobs:
       - name: Build Android release APK
         run: cd example/android && chmod +x gradlew && ./gradlew assembleRelease
         env:
-          ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ndk-path }}
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
-      - name: Rename and upload APK to Release
+      - name: Rename APK
         run: |
           APK_PATH="example/android/app/build/outputs/apk/release/app-release.apk"
           if [ -f "$APK_PATH" ]; then
@@ -85,9 +87,17 @@ jobs:
           fi
 
       - name: Upload APK to Release
+        if: github.event_name == 'release'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ghost-guide-example-${{ github.ref_name }}.apk
           tag: ${{ github.ref }}
           overwrite: true
+
+      - name: Upload APK as Artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghost-guide-example-${{ github.ref_name }}.apk
+          path: ghost-guide-example-${{ github.ref_name }}.apk
