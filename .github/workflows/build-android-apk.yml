@@ -3,6 +3,7 @@ name: Build Android APK
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   build-android-apk:
@@ -67,14 +68,14 @@ jobs:
       - name: Install example dependencies
         run: cd example && npm install
 
-      - name: Build Android debug APK
-        run: cd example/android && chmod +x gradlew && ./gradlew assembleDebug
+      - name: Build Android release APK
+        run: cd example/android && chmod +x gradlew && ./gradlew assembleRelease
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ndk-path }}
 
       - name: Rename and upload APK to Release
         run: |
-          APK_PATH="example/android/app/build/outputs/apk/debug/app-debug.apk"
+          APK_PATH="example/android/app/build/outputs/apk/release/app-release.apk"
           if [ -f "$APK_PATH" ]; then
             cp "$APK_PATH" "ghost-guide-example-${{ github.ref_name }}.apk"
           else
