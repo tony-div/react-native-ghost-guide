@@ -68,7 +68,7 @@ jobs:
         run: cd example && npm install
 
       - name: Build Android debug APK
-        run: cd example/android && ./gradlew assembleDebug
+        run: cd example/android && chmod +x gradlew && ./gradlew assembleDebug
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ndk-path }}
 
