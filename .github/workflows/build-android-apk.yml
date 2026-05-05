@@ -1,0 +1,92 @@
+name: Build Android APK
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-android-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            example/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK with NDK
+        id: setup-android
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: 34.0.0
+          ndk-version: '25.2.9519653'
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Generate native code and compile TypeScript
+        run: |
+          npm run specs
+          npm run typescript
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+
+      - name: Build Android Rust libraries
+        run: |
+          if [ -f build_rust.sh ]; then
+            chmod +x build_rust.sh
+            ./build_rust.sh
+          elif [ -f Cargo.toml ]; then
+            cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -t x86 -o cpp/libs build --release
+          else
+            echo "No Rust build script or Cargo.toml found, skipping Rust build"
+          fi
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ndk-path }}
+
+      - name: Install example dependencies
+        run: cd example && npm install
+
+      - name: Build Android debug APK
+        run: cd example/android && ./gradlew assembleDebug
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ndk-path }}
+
+      - name: Rename and upload APK to Release
+        run: |
+          APK_PATH="example/android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$APK_PATH" ]; then
+            cp "$APK_PATH" "ghost-guide-example-${{ github.ref_name }}.apk"
+          else
+            echo "APK not found at $APK_PATH"
+            find example/android/app/build/outputs/apk -name "*.apk"
+            exit 1
+          fi
+
+      - name: Upload APK to Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ghost-guide-example-${{ github.ref_name }}.apk
+          tag: ${{ github.ref }}
+          overwrite: true

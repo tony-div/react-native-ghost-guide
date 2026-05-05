@@ -1,0 +1,91 @@
+{
+  "name": "react-native-ghost-guide",
+  "version": "0.1.0",
+  "description": "Real-time pose guidance with ghost skeleton overlays",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
+  "files": [
+    "src",
+    "lib",
+    "README.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf lib",
+    "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
+    "lint-ci": "eslint \"**/*.{js,ts,tsx}\" -f @jamesacarr/github-actions",
+    "typescript": "tsc",
+    "specs": "tsc --noEmit false"
+  },
+  "keywords": [
+    "react-native",
+    "pose",
+    "skeleton",
+    "fitness"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tony-div/react-native-ghost-guide.git"
+  },
+  "author": "tony-div",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tony-div/react-native-ghost-guide/issues"
+  },
+  "homepage": "https://github.com/tony-div/react-native-ghost-guide#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@react-native/eslint-config": "0.83.0",
+    "@types/react": "^19.1.03",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3",
+    "react": "19.2.0",
+    "react-native": "0.83.0",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@react-native",
+      "prettier"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "warn",
+        {
+          "quoteProps": "consistent",
+          "singleQuote": true,
+          "tabWidth": 2,
+          "trailingComma": "es5",
+          "useTabs": false
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false,
+    "semi": false
+  }
+}

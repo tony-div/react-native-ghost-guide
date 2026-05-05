@@ -1,0 +1,6 @@
+numpy
+mediapipe
+opencv-python
+streamlit>=1.27.0
+scipy
+yt-dlp
