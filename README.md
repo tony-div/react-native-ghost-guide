@@ -5,7 +5,7 @@ Ghost Guide is a TypeScript-first library for driving pose-aligned ghost skeleto
 ## Install
 
 ```bash
-npm install react-native-ghost-guide
+npm install github:tony-div/react-native-ghost-guide
 ```
 
 ## API
